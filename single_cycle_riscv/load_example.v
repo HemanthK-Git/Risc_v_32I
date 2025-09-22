@@ -1,3 +1,9 @@
+// addi x5,x0,0x2 # data
+// addi x6, x0,0x40 # base address
+
+// sw x5, 0x8(x6)
+// lw x7, 0x8(x6)
+
 `timescale 1ns/1ps
 
 module single_cycle_riscv (
