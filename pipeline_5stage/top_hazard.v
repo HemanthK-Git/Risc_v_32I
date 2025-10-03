@@ -560,15 +560,19 @@ module program_counter (
     input        clk,
     input        rst,
     input  [31:0] pc_in,
-    output reg [31:0] pc_out
+    output [31:0] pc_out
 );
+    reg [31:0] pc_reg;
+
     always @(posedge clk) begin
         if (rst) begin
-            pc_out <= 32'b0; // Reset PC to 0
+            pc_reg <= 32'd0; // Reset PC to 0
         end else begin
-            pc_out <= pc_in; // Update PC with new value
+            pc_reg <= pc_in; // Update PC with new value
         end
     end
+
+    assign pc_out = pc_reg;
 
 endmodule
 
@@ -589,7 +593,7 @@ module instruction_memory (
     //    inst_memory[1] = 32'h00832383;
     // end
 
-    assign instruction_out = (rst == 1'b1) ? 32'b0 : inst_memory[inst_mem_in[31:2]]; // Word-aligned access (pc[31:2] for 1024 words)
+    assign instruction_out = (rst == 1'b1) ? 32'd0 : inst_memory[inst_mem_in[31:2]]; // Word-aligned access (pc[31:2] for 1024 words)
 
 endmodule
 
@@ -705,8 +709,8 @@ module register_file (
     integer i;
 
     // Read ports (combinational)
-    assign read_data1 = (rst == 1'b1) ? 32'b0 : registers[reg_addr1];
-    assign read_data2 = (rst == 1'b1) ? 32'b0 : registers[reg_addr2];
+    assign read_data1 = (rst == 1'b1) ? 32'd0 : registers[reg_addr1];
+    assign read_data2 = (rst == 1'b1) ? 32'd0 : registers[reg_addr2];
 
     // Write port (sequential)
     always @(negedge clk ) begin
@@ -791,7 +795,7 @@ module data_memory (
     reg [31:0] data_memory [1023:0]; // 1024 words of 32-bit memory
 
     // Read port (combinational)
-    assign data_mem_read_data = (rst == 1'b1) ? 32'b0 : data_memory[data_mem_address[31:2]]; // Word-aligned access (address[31:2] for 1024 words)
+    assign data_mem_read_data = (rst == 1'b1) ? 32'd0 : data_memory[data_mem_address[31:2]]; // Word-aligned access (address[31:2] for 1024 words)
 
     // Write port (sequential)
     always @(posedge clk) begin
