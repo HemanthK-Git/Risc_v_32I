@@ -1,4 +1,10 @@
+// addi x5,x0,0x5 
+// addi x6, x0,0x3 
+// add x7, x5, x6
 
+// lw x8, 0x0(x0)
+// addi x9, x0, 0x1
+// add x10, x8, x9
 
 
 `timescale 1ns/1ps
