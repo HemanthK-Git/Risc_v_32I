@@ -1,34 +1,34 @@
+
+
+
 `timescale 1ns/1ps
 
-module riscv_5stage_tb();
-    reg clk, rst; 
+module riscv_5stage_hazard_tb();
+    reg rst; 
+    reg clk = 1'b0;
     
-    riscv_5stage dut (
+    riscv_5stage_hazard dut (
         .clk(clk), 
         .rst(rst)
 );
 
-    // Clock generation
+// Clock generation - 100ns period
     always begin
-        #50 clk = ~clk; // Toggle clock every 5 time units
-    end  
-
-
-    initial begin
-        // Initialize signals
-        clk = 0;
-        rst = 1;
-
-        // Release reset after some time
-        #200;
-        rst = 0;
-
-        // Run the simulation for a certain period
-        #1500;    
-
-        // Finish the simulation
-        $finish;
+        clk = ~clk;
+        #50;
     end
+    
+    // Reset generation
+    initial begin
+        rst <= 1'b1;      // Reset HIGH (active)
+        #100;
+        rst <= 1'b0;      // Reset LOW (inactive)
+        #1500;
+        $finish;    
+    end
+    
+    
+    
 
        
 endmodule
