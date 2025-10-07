@@ -212,7 +212,7 @@ module fetch_cycle (
     );
 
     // Fetch Pipeline registers
-    always @(posedge clk ) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             pc_reg <= 32'd0;
             inst_mem_reg <= 32'd0;
@@ -224,9 +224,9 @@ module fetch_cycle (
         end
     end
 
-    assign inst_mem_delay =  inst_mem_reg;
-    assign pc_delay =  pc_reg;
-    assign pc_adder_delay =  pc_adder_reg;
+    assign inst_mem_delay = (rst == 1'b1) ? 32'd0 : inst_mem_reg;
+    assign pc_delay =  (rst == 1'b1) ? 32'd0 : pc_reg;
+    assign pc_adder_delay =  (rst == 1'b1) ? 32'd0 : pc_adder_reg;
 
 endmodule
 
@@ -562,9 +562,9 @@ module program_counter (
     input  [31:0] pc_in,
     output [31:0] pc_out
 );
-    reg [31:0] pc_reg;
+    reg [31:0] pc_reg ;
 
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             pc_reg <= 32'd0; // Reset PC to 0
         end else begin
