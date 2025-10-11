@@ -1,45 +1,48 @@
 `timescale 1ns / 1ps
 
 module riscv_5stage_hazard (
-    input clk, rst
+    input clk, rst,
+
+    output [31:0] inst_mem_out,
+    output [31:0] pc_out,
+    output [31:0] pc_adder_out,
+
+    output reg_write_signal_out, mem_write_signal_out, jump_signal_out, branch_signal_out, alu_src_signal_out,
+    output [1:0] result_src_signal_out,
+    output [2:0] alu_control_out, 
+    output [31:0] reg_data_1_out, reg_data_2_out, imm_ext_out, pc_decode_out, pc_adder_decode_out,
+    output [4:0] write_reg_addr_decode_out, src1_D_haz, src2_D_haz,
+    output [4:0] source1_addr_decode, source2_addr_decode,
+
+    output reg_write_exe_out,  mem_write_exe_out  , pc_src_out , o_pc_src_exe_hazard,
+    output [1:0] result_src_exe_out,
+    output [31:0] alu_result_exe_out, reg_data_2_out_exe_out, pc_adder_exe_out, pc_target_out,
+    output [4:0] write_reg_addr_exe_out, source1_addr_exe, source2_addr_exe, O_write_reg_add_E_haz,
+    output [1:0] O_result_src_E_haz,
+
+    output reg_write_mem_out,
+    output [1:0] result_src_mem_out,
+    output [31:0] mem_data_out_mem_out, alu_result_out_mem_out, pc_adder_out_mem_out,
+    output [4:0] write_reg_file_addr_out, write_reg_addr_mem_haz_wire,
+    output  reg_write_mem_haz, 
+    output [31:0] alu_result_exe_haz,
+
+    output [31:0] final_result_out,
+    output reg_write_wb_out,
+    output [4:0] write_wb_addr_out,
+
+    output [1:0] forwardA_exe, forwardB_exe,
+    output StallF, StallD, FlushE, i_flushD
+    
 );
 
-wire pc_src_out, reg_write_out, reg_write_signal_out, mem_write_signal_out;
-wire jump_signal_out, branch_signal_out, alu_src_signal_out;
-wire [1:0] result_src_signal_out;
-wire [31:0] pc_target_out, inst_mem_out, pc_out, pc_adder_out, final_result_out;
-wire [4:0] write_reg_file_addr_out;
-wire [2:0] alu_control_out;
-wire [31:0] reg_data_1_out, reg_data_2_out, imm_ext_out, pc_decode_out;
-wire [4:0] write_reg_addr_decode_out;
-wire [31:0] pc_adder_decode_out;
+wire  reg_write_out;
 
-wire reg_write_exe_out, mem_write_exe_out;
-wire [1:0] result_src_exe_out;
-wire [31:0] alu_result_exe_out, reg_data_2_out_exe_out, pc_adder_exe_out;
-wire [4:0] write_reg_addr_exe_out;
 
-wire reg_write_mem_out;
-wire [1:0] result_src_mem_out;
-wire [31:0] mem_data_out_mem_out, alu_result_out_mem_out, pc_adder_out_mem_out;
-wire reg_write_wb_out;
-wire [4:0] write_wb_addr_out;
 
-wire [4:0] source1_addr_decode, source2_addr_decode;
-wire [4:0] source1_addr_exe, source2_addr_exe;
-wire [1:0] forwardA_exe, forwardB_exe;
-wire [31:0] alu_result_exe_haz;
-wire reg_write_mem_haz;
-wire [4:0] write_reg_addr_mem_haz_wire;
 wire reg_write_mem_haz_wire;
 
-wire StallF, StallD, FlushE;
-wire [4:0] src1_D_haz, src2_D_haz;
-wire [4:0] O_write_reg_add_E_haz;
-wire [1:0] O_result_src_E_haz;
 
-wire i_flushD;
-wire o_pc_src_exe_hazard;
 
 
 // fetch stage 
@@ -770,24 +773,28 @@ module register_file (
     output [31:0] read_data1,
     output [31:0] read_data2
 );
-    reg [31:0] registers [31:0]; // 32 registers of 32 bits each
+    reg [31:0] registers [31:0]; 
     integer i;
 
     // Read ports (combinational)
     assign read_data1 = (rst == 1'b1) ? 32'd0 : registers[reg_addr1];
     assign read_data2 = (rst == 1'b1) ? 32'd0 : registers[reg_addr2];
 
-    // Write port (sequential)
-    always @(negedge clk ) begin
-        if (reg_write_enable && reg_write_addr != 5'b00000) begin
-            registers[reg_write_addr] <= write_data; // Ensure x0 is always 0
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            for (i = 0; i < 32; i = i + 1) begin  
+                registers[i] <= 32'd0;
+            end
         end
     end
 
-    initial begin
-        registers[0] = 32'd0; // x0 = 0
-        registers[5] = 32'd10; // x5 = 10
+    // Write port (sequential)
+    always @(negedge clk ) begin
+        if (reg_write_enable && reg_write_addr != 5'b00000) begin
+            registers[reg_write_addr] <= write_data; 
+        end
     end
+
 
 endmodule
 
@@ -858,21 +865,26 @@ module data_memory (
     output [31:0] data_mem_read_data
 );
     reg [31:0] data_memory [1023:0]; // 1024 words of 32-bit memory
-
-    // Read port (combinational)
-    assign data_mem_read_data = (rst == 1'b1) ? 32'd0 : data_memory[data_mem_address[31:2]]; // Word-aligned access (address[31:2] for 1024 words)
-
+    integer i;
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            for (i = 0; i < 1024; i = i + 1) begin
+                data_memory[i] <= 32'd0;
+            end
+        end
+    end
+    
     // Write port (sequential)
     always @(posedge clk) begin
         if (data_mem_write_enable && !rst) begin
             data_memory[data_mem_address[31:2]] <= data_mem_write_data; // Word-aligned access
         end
     end 
-    
-    initial begin
-        data_memory [0] = 32'd0;
-        data_memory [40] = 32'h00000002;
-    end
+
+    // Read port (combinational)
+    assign data_mem_read_data = (rst == 1'b1) ? 32'd0 : data_memory[data_mem_address[31:2]]; // Word-aligned access (address[31:2] for 1024 words)
+
+
 
 endmodule
 
