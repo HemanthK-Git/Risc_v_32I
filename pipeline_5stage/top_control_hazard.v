@@ -871,14 +871,12 @@ module data_memory (
             for (i = 0; i < 1024; i = i + 1) begin
                 data_memory[i] <= 32'd0;
             end
-        end
-    end
-    
-    // Write port (sequential)
-    always @(posedge clk) begin
-        if (data_mem_write_enable && !rst) begin
+        end else begin
+            if (data_mem_write_enable && !rst) begin
             data_memory[data_mem_address[31:2]] <= data_mem_write_data; // Word-aligned access
+            end
         end
+        
     end 
 
     // Read port (combinational)
