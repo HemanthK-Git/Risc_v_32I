@@ -589,6 +589,8 @@ assign pc_target_exe = is_jalr ? {jalr_target_calc[31:1], 1'b0} : pc_target_calc
     assign funct3_exe = funct3_reg;
     assign source1_addr_exe = source1_addr_in;
     assign source2_addr_exe = source2_addr_in;
+    assign write_reg_addr_out_hazard = write_reg_addr_in;
+    assign result_src_exe_hazard = result_src;
     assign imm_ext_exe = imm_ext_reg;
 
 endmodule
