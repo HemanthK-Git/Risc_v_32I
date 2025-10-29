@@ -3,8 +3,9 @@
 module riscv_5stage_hazard (
     input clk, rst,
 
-    output [31:0] inst_mem_out,
-    output [31:0] pc_out,
+    output [31:0] inst_mem_out, // current instruction
+    output [31:0] pc_out, // current pc value
+
     output [31:0] pc_adder_out,
 
     output reg_write_signal_out, mem_write_signal_out, jump_signal_out, branch_signal_out, alu_src_signal_out,
@@ -22,7 +23,6 @@ module riscv_5stage_hazard (
     output [4:0] write_reg_addr_exe_out, source1_addr_exe, source2_addr_exe, O_write_reg_add_E_haz,
     output [1:0] O_result_src_E_haz,
     output [2:0] funct3_exe_out,
-    output [6:0] opcode_exe_out,
     output [31:0] imm_ext_exe_out,
 
     output reg_write_mem_out,
@@ -33,9 +33,9 @@ module riscv_5stage_hazard (
     output [31:0] alu_result_exe_haz,
     output [31:0] imm_ext_mem_out,
 
-    output [31:0] final_result_out,
-    output reg_write_wb_out,
-    output [4:0] write_wb_addr_out,
+    output [31:0] final_result_out, // final result from writeback stage
+    output reg_write_wb_out,        // write enable signal
+    output [4:0] write_wb_addr_out, // register address
 
     output [1:0] forwardA_exe, forwardB_exe,
     output StallF, StallD, FlushE, i_flushD,
@@ -46,7 +46,7 @@ module riscv_5stage_hazard (
 );
 
 wire ecall_wire, ebreak_wire;
-
+wire [1:0] result_src_mem_haz_wire;
 // fetch stage 
 fetch_cycle fetch (
     .clk(clk),
@@ -168,7 +168,8 @@ memory_cycle memory (
     .write_reg_addr_out_mem_haz(write_reg_addr_mem_haz_wire),
     .reg_write_mem_out_haz(reg_write_mem_haz),
     .alu_result_out_mem_haz(alu_result_exe_haz),
-    .imm_ext_out_mem(imm_ext_mem_out)
+    .imm_ext_out_mem(imm_ext_mem_out),
+    .result_src_mem_haz(result_src_mem_haz_wire) 
 );
 
 // writeback stage
@@ -259,12 +260,12 @@ module fetch_cycle (
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             pc_reg <= 32'd0;
-            inst_mem_reg <= 32'd0;
+            inst_mem_reg <= 32'h00000013;
             pc_adder_reg <= 32'd0;
         end else if (flushD) begin
-            pc_reg <= 32'd0;
-            inst_mem_reg <= 32'd0;
-            pc_adder_reg <= 32'd0;
+            pc_reg <= pc_out_wire; 
+            inst_mem_reg <= 32'h00000013;
+            pc_adder_reg <= pc_adder_out_wire;
         end
         else if (!stallD) begin
             pc_reg <= pc_out_wire;
@@ -273,7 +274,7 @@ module fetch_cycle (
         end
     end
 
-    assign inst_mem_delay = (rst == 1'b1) ? 32'd0 : inst_mem_reg;
+    assign inst_mem_delay = (rst == 1'b1) ? 32'h00000013 : inst_mem_reg;
     assign pc_delay =  (rst == 1'b1) ? 32'd0 : pc_reg;
     assign pc_adder_delay =  (rst == 1'b1) ? 32'd0 : pc_adder_reg;
 
@@ -382,7 +383,7 @@ sign_extension imm_gen (
         end else if (flushE) begin
             reg_write_reg <= 1'b0;
             mem_write_reg <= 1'b0;
-            opcode_reg <= 7'b0;
+            opcode_reg <= 7'b0010011;
             funct3_reg <= 3'b0;
             jump_reg <= 1'b0;
             branch_reg <= 1'b0;
@@ -392,9 +393,9 @@ sign_extension imm_gen (
             reg_data_1_out_reg <= 32'd0;
             reg_data_2_out_reg <= 32'd0;
             imm_ext_reg <= 32'd0;
-            pc_reg <= 32'd0;
+            pc_reg <= pc_in;
             write_reg_reg <= 5'd0;
-            pc_adder_reg <= 32'd0;
+            pc_adder_reg <= pc_adder_in;
             source1_reg <= 5'd0;
             source2_reg <= 5'd0;
             ecall_reg <= 1'b0;
@@ -506,7 +507,8 @@ assign branch_taken = (funct3_in == 3'b000) ? zero :              // BEQ: branch
                       (funct3_in == 3'b111) ? carry :             // BGEU: branch if greater/equal (unsigned)
                       1'b0;                                       // Default: no branch
 
-assign pc_src_exe = (branch && branch_taken) || jump;  // CHANGE THIS LINE
+
+assign pc_src_exe = (branch && branch_taken) || jump ;
 assign pc_src_exe_hazard = pc_src_exe;
 
 mux_2x1 reg_to_alu_mux (
@@ -611,7 +613,8 @@ module memory_cycle (
     output [31:0] alu_result_out_mem_haz,
     output [4:0] write_reg_addr_out_mem_haz,
     output reg_write_mem_out_haz,
-    output [31:0] imm_ext_out_mem
+    output [31:0] imm_ext_out_mem,
+    output [1:0] result_src_mem_haz
 );
 
 wire [31:0] mem_data_out;
@@ -662,6 +665,7 @@ data_memory data_mem (
     assign write_reg_addr_out_mem_haz = write_reg_addr_in;
     assign reg_write_mem_out_haz = reg_write;
     assign imm_ext_out_mem = imm_ext_reg;
+    assign result_src_mem_haz = result_src;
 
 endmodule
 
@@ -744,7 +748,7 @@ module instruction_memory (
     //    inst_memory[1] = 32'h00832383;
     // end
 
-    assign instruction_out = (rst == 1'b1) ? 32'd0 : inst_memory[inst_mem_in[31:2]]; // Word-aligned access (pc[31:2] for 1024 words)
+    assign instruction_out = (rst == 1'b1) ? 32'h00000013 : inst_memory[inst_mem_in[11:2]]; // Word-aligned access (pc[31:2] for 1024 words)
 
 endmodule
 
@@ -897,8 +901,10 @@ module register_file (
     integer i;
 
     // Read ports (combinational)
-    assign read_data1 = (rst == 1'b1) ? 32'd0 : registers[reg_addr1];
-    assign read_data2 = (rst == 1'b1) ? 32'd0 : registers[reg_addr2];
+    assign read_data1 = (rst == 1'b1) ? 32'd0 : 
+                        (reg_addr1 == 5'd0) ? 32'd0 : registers[reg_addr1];
+    assign read_data2 = (rst == 1'b1) ? 32'd0 : 
+                        (reg_addr2 == 5'd0) ? 32'd0 : registers[reg_addr2];
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -1027,31 +1033,27 @@ module data_memory (
     input  [31:0] data_mem_write_data,
     input  [2:0]  funct3, 
 
-    output [31:0] data_mem_read_data
+    output [31:0] data_mem_read_data  // Keep as wire
 );
-    reg [31:0] data_memory [1023:0]; // 1024 words of 32-bit memory
+    reg [31:0] data_memory [1023:0];
+    
     integer i;
 
     wire [1:0] byte_offset;
-    wire [31:0] word_address;
+    wire [9:0] word_address;
     wire [31:0] word_data;
     
     assign byte_offset = data_mem_address[1:0];
-    assign word_address = data_mem_address[31:2];
+    assign word_address = data_mem_address[11:2];
     assign word_data = data_memory[word_address];
 
-    // Reset Logic
+    // Write logic
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             for (i = 0; i < 1024; i = i + 1) begin
                 data_memory[i] <= 32'd0;
             end
-        end
-    end
-    
-    // Write port - supports byte, half-word, and word writes
-    always @(posedge clk) begin
-        if (data_mem_write_enable && !rst) begin
+        end else if (data_mem_write_enable) begin
             case (funct3)
                 3'b000: begin // SB - Store Byte
                     case (byte_offset)
@@ -1126,7 +1128,7 @@ module data_memory (
     assign data_mem_read_data = read_data_temp;
 
 endmodule
-
+   
 // 11. multiplexer 4:1
 module mux_4to1 (
     input  [31:0] mux_input_0,
@@ -1159,10 +1161,12 @@ module hazard(
 
     wire lw_stall;
 
-    assign lw_stall = result_src_exe_hazard[0] & 
-                    ((write_reg_addr_exe_hazard == source1_addr_dec_hazard) | 
-                    (write_reg_addr_exe_hazard == source2_addr_dec_hazard)) &
-                    (write_reg_addr_exe_hazard != 5'd0);
+
+    assign lw_stall = (result_src_exe_hazard == 2'b01) &&
+                  (write_reg_addr_exe_hazard != 5'd0) &&
+                  ((write_reg_addr_exe_hazard == source1_addr_dec_hazard) ||
+                   (write_reg_addr_exe_hazard == source2_addr_dec_hazard));
+
     
     // Stall and flush signals
     assign stallF = lw_stall;
