@@ -129,7 +129,7 @@ This implementation demonstrates excellent characteristics for pacemaker and med
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| **Max Frequency** | >350 MHz (estimated) | ✅ Excellent |
+| **Max Frequency** | >60 MHz  | ✅ Excellent |
 | **Total Power** | 97 mW | ✅ Medical Grade |
 | **Timing Margin** | 0.283 ns | ✅ Robust |
 | **Hold Margin** | 0.123 ns | ✅ Stable |
