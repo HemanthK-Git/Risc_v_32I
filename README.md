@@ -72,7 +72,8 @@ The processor implements a comprehensive hazard resolution system to maintain pi
 - Issues pipeline stall signals when necessary
 - Manages pipeline flushes for control flow changes
 
-### Block Diagram
+### Block Diagram:
+I have taken the reference from the book **"David Harris Digital Design"**
 <img width="1115" height="695" alt="image" src="https://github.com/user-attachments/assets/c8cb4813-0064-425a-aae9-580cac19b348" />
 
 
