@@ -1,6 +1,6 @@
-# RISC-V 5-Stage Pipeline Processor
+# RISCV 5-Stage Pipeline Processor with Hazard Detection
 
-A hardware implementation of a 5-stage pipelined processor based on the RISC-V ISA. This project is designed for educational purposes, FPGA prototyping, and to serve as a baseline for microarchitectural exploration.
+A hardware implementation of a 5-stage pipelined processor based on the RISC-V 32ISA. This project is designed for educational purposes, FPGA prototyping, and to serve as a baseline for microarchitectural exploration.
 
 ## 📑 Table of Contents
 
