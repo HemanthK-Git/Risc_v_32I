@@ -1,4 +1,4 @@
-# RISCV 5-Stage Pipeline Processor with Hazard Detection
+# RISC-V 5-Stage Pipeline Processor with Hazard Detection
 
 A hardware implementation of a 5-stage pipelined processor based on the RISC-V 32I ISA. This project implements a complete 5-stage pipeline with comprehensive hazard detection and has been successfully synthesized for low-power medical applications, serving as a baseline microarchitecture for future pacemaker integration.
 
@@ -19,15 +19,15 @@ This repository contains the source code and documentation for a fully-functiona
 
 ## Features
 
-* **ISA Support:** RV32I Base Integer Instruction Set
-* **Pipeline:** Standard 5-Stage (IF, ID, EX, MEM, WB)
-* **Hazard Handling:**
-  * **Data Hazards:** Resolved via **Forwarding (Bypassing)** from EX/MEM and MEM/WB stages
-  * **Control Hazards:** Branches resolved in ID stage with 1-cycle penalty
-  * **Load-Use Hazards:** Detected and handled with pipeline stalls
-* **Memory Architecture:** Harvard Architecture with separate Instruction and Data Memory
-* **Synthesizable:** Written in synthesizable Verilog/VHDL
-* **Tested:** Comprehensive test suite including ISA compliance tests
+- **ISA Support:** RV32I Base Integer Instruction Set
+- **Pipeline:** Standard 5-Stage (IF, ID, EX, MEM, WB)
+- **Hazard Handling:**
+  - **Data Hazards:** Resolved via **Forwarding (Bypassing)** from EX/MEM and MEM/WB stages
+  - **Control Hazards:** Branches resolved in ID stage with 1-cycle penalty
+  - **Load-Use Hazards:** Detected and handled with pipeline stalls
+- **Memory Architecture:** Harvard Architecture with separate Instruction and Data Memory
+- **Synthesizable:** Written in synthesizable Verilog
+- **Tested:** Comprehensive test suite including ISA compliance tests
 
 ## Microarchitecture
 
@@ -48,19 +48,19 @@ The processor implements a classic 5-stage RISC pipeline with comprehensive haza
 The processor implements a comprehensive hazard resolution system to maintain pipeline efficiency and ensure correct execution:
 
 #### Data Hazards
-- **Forwarding (Bypassing)**: Results from EX, MEM, and WB stages are forwarded directly to the EX stage as ALU inputs
-- **Load-Use Stalls**: Pipeline stalls for one cycle when an instruction immediately depends on a preceding load operation
-- **Register File Bypass**: Write-back and register read happen in same cycle for back-to-back dependencies
+- **Forwarding (Bypassing):** Results from EX, MEM, and WB stages are forwarded directly to the EX stage as ALU inputs
+- **Load-Use Stalls:** Pipeline stalls for one cycle when an instruction immediately depends on a preceding load operation
+- **Register File Bypass:** Write-back and register read happen in same cycle for back-to-back dependencies
 
 #### Control Hazards
-- **Branch Prediction**: Static prediction assumes branches are not taken
-- **Branch Resolution**: Branches resolved in EX stage with 1-cycle penalty on misprediction
-- **Pipeline Flush**: Incorrectly fetched instructions after branches are flushed from IF and ID stages
+- **Branch Prediction:** Static prediction assumes branches are not taken
+- **Branch Resolution:** Branches resolved in EX stage with 1-cycle penalty on misprediction
+- **Pipeline Flush:** Incorrectly fetched instructions after branches are flushed from IF and ID stages
 
 #### Structural Hazards
-- **Memory Arbitration**: Separate instruction and data memories eliminate memory access conflicts
-- **Register File**: Multi-port design supports simultaneous read and write operations
-- **Write-back Priority**: Ensures correct register update ordering when multiple writes occur
+- **Memory Arbitration:** Separate instruction and data memories eliminate memory access conflicts
+- **Register File:** Multi-port design supports simultaneous read and write operations
+- **Write-back Priority:** Ensures correct register update ordering when multiple writes occur
 
 #### Hazard Detection Unit
 - Monitors pipeline registers for dependencies between instructions
@@ -68,9 +68,11 @@ The processor implements a comprehensive hazard resolution system to maintain pi
 - Issues pipeline stall signals when necessary
 - Manages pipeline flushes for control flow changes
 
-### Block Diagram:
-I have taken the reference from the book **"David Harris Digital Design"**
-<img width="1115" height="695" alt="image" src="https://github.com/user-attachments/assets/c8cb4813-0064-425a-aae9-580cac19b348" />
+### Block Diagram
+
+Reference architecture based on **"Digital Design and Computer Architecture"** by David Harris and Sarah Harris.
+
+<img width="1115" height="695" alt="RISC-V Pipeline Block Diagram" src="https://github.com/user-attachments/assets/c8cb4813-0064-425a-aae9-580cac19b348">
 
 ## 📊 Synthesis Results
 
@@ -125,7 +127,7 @@ This implementation demonstrates excellent characteristics for pacemaker and med
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| **Max Frequency** | >60 MHz  | ✅ Excellent |
+| **Maximum Frequency** | >60 MHz | ✅ Excellent |
 | **Total Power** | 97 mW | ✅ Medical Grade |
 | **Timing Margin** | 0.283 ns | ✅ Robust |
 | **Hold Margin** | 0.123 ns | ✅ Stable |
@@ -133,8 +135,10 @@ This implementation demonstrates excellent characteristics for pacemaker and med
 
 ## Future Work
 
-- **Medical Integration**: Optimize for pacemaker deployment with ultra-low power modes and safety certification
-- **Performance Enhancement**: Add cache memory, hardware multipliers, and advanced branch prediction
-- **System Expansion**: Integrate peripheral interfaces, security features, and real-time operating system support
+- **Medical Integration:** Optimize for pacemaker deployment with ultra-low power modes and safety certification
+- **Performance Enhancement:** Add cache memory, hardware multipliers, and advanced branch prediction
+- **System Expansion:** Integrate peripheral interfaces, security features, and real-time operating system support
+
+---
 
 **Note:** These results confirm the processor is suitable for low-power medical applications including pacemaker integration, with robust timing closure and power characteristics meeting stringent healthcare requirements.
