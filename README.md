@@ -37,13 +37,40 @@ This repository contains the source code and documentation for a fully-functiona
 
 ### Pipeline Stages
 
+The processor implements a classic 5-stage RISC pipeline with comprehensive hazard handling.
+
 | Stage | Acronym | Description |
-|-------|---------|-------------|
-| **Instruction Fetch** | IF | Fetches instruction from IMEM using PC, increments PC by 4 |
-| **Instruction Decode** | ID | Decodes instruction, reads registers, generates control signals |
-| **Execute** | EX | ALU operations, address calculation, forwarding resolution |
-| **Memory Access** | MEM | Data memory access for load/store instructions |
-| **Write Back** | WB | Writes result back to register file |
+|-------|----------|-------------|
+| **Instruction Fetch** | IF | Fetches instruction from IMEM using PC address<br>Increments PC by 4 for next instruction<br>Handles branch and jump redirection from EX stage |
+| **Instruction Decode** | ID | Decodes instruction opcode and fields<br>Reads source registers from register file<br>Generates pipeline control signals<br>Sign-extends immediate values<br>Hazard detection for RAW dependencies |
+| **Execute** | EX | Performs ALU operations and calculations<br>Computes memory addresses for load/store<br>Evaluates branch conditions and targets<br>Data forwarding from MEM/WB stages |
+| **Memory Access** | MEM | Accesses data memory for load/store operations<br>Reads data for load instructions<br>Writes data for store instructions<br>Bypasses memory for non-memory instructions |
+| **Write Back** | WB | Writes results back to register file<br>Selects data from ALU result or memory load<br>Completes instruction execution cycle |
+
+### Hazard Handling
+
+The processor implements a comprehensive hazard resolution system to maintain pipeline efficiency and ensure correct execution:
+
+#### Data Hazards
+- **Forwarding (Bypassing)**: Results from EX, MEM, and WB stages are forwarded directly to the EX stage as ALU inputs
+- **Load-Use Stalls**: Pipeline stalls for one cycle when an instruction immediately depends on a preceding load operation
+- **Register File Bypass**: Write-back and register read happen in same cycle for back-to-back dependencies
+
+#### Control Hazards
+- **Branch Prediction**: Static prediction assumes branches are not taken
+- **Branch Resolution**: Branches resolved in EX stage with 1-cycle penalty on misprediction
+- **Pipeline Flush**: Incorrectly fetched instructions after branches are flushed from IF and ID stages
+
+#### Structural Hazards
+- **Memory Arbitration**: Separate instruction and data memories eliminate memory access conflicts
+- **Register File**: Multi-port design supports simultaneous read and write operations
+- **Write-back Priority**: Ensures correct register update ordering when multiple writes occur
+
+#### Hazard Detection Unit
+- Monitors pipeline registers for dependencies between instructions
+- Generates forwarding control signals for operand selection
+- Issues pipeline stall signals when necessary
+- Manages pipeline flushes for control flow changes
 
 ### Block Diagram
 
