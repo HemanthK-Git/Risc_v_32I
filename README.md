@@ -76,3 +76,19 @@ The processor implements a comprehensive hazard resolution system to maintain pi
 I have taken the reference from the book **"David Harris Digital Design"**
 <img width="1115" height="695" alt="image" src="https://github.com/user-attachments/assets/c8cb4813-0064-425a-aae9-580cac19b348" />
 
+riscv-pipeline/
+├── rtl/                    # Source HDL files
+│   ├── core/              # Main processor core
+│   ├── hazard/            # Hazard detection unit
+│   └── memory/            # Memory interfaces
+├── testbench/             # Verification environment
+│   ├── unit_tests/        # Individual module tests
+│   ├── integration_tests/ # Full pipeline tests
+│   └── isa_tests/         # RISCV compliance tests
+├── docs/                  # Documentation
+│   ├── microarchitecture/ # Detailed design docs
+│   └── verification/      # Test planning
+├── scripts/               # Build and test scripts
+├── constraints/           # Timing and synthesis constraints
+└── results/               # Synthesis and simulation results
+
