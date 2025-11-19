@@ -1,1 +1,1 @@
-# Risc_v_32I
+RISC-V 5-Stage Pipeline Processor
