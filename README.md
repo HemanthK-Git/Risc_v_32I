@@ -7,15 +7,11 @@ A hardware implementation of a 5-stage pipelined processor based on the RISC-V 3
 - [Overview](#overview)
 - [Features](#features)
 - [Microarchitecture](#microarchitecture)
-- [Repository Structure](#repository-structure)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Testing](#testing)
-- [Results](#results)
+- [Synthesis Results](#synthesis-results)
+- [Key Achievements](#key-achievements)
+- [Medical Application Suitability](#medical-application-suitability)
+- [Performance Metrics](#performance-metrics)
 - [Future Work](#future-work)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 ## Overview
 
@@ -135,6 +131,10 @@ This implementation demonstrates excellent characteristics for pacemaker and med
 | **Hold Margin** | 0.123 ns | ✅ Stable |
 | **Design Size** | 68,800 endpoints | ✅ Compact |
 
----
+## Future Work
+
+- **Medical Integration**: Optimize for pacemaker deployment with ultra-low power modes and safety certification
+- **Performance Enhancement**: Add cache memory, hardware multipliers, and advanced branch prediction
+- **System Expansion**: Integrate peripheral interfaces, security features, and real-time operating system support
 
 **Note:** These results confirm the processor is suitable for low-power medical applications including pacemaker integration, with robust timing closure and power characteristics meeting stringent healthcare requirements.
