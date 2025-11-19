@@ -73,20 +73,8 @@ The processor implements a comprehensive hazard resolution system to maintain pi
 - Manages pipeline flushes for control flow changes
 
 ### Block Diagram
+<img width="1115" height="695" alt="image" src="https://github.com/user-attachments/assets/c8cb4813-0064-425a-aae9-580cac19b348" />
 
-+-----+    +-----+    +-----+    +-----+    +-----+
-| IF  | -> | ID  | -> | EX  | -> | MEM | -> | WB  |
-+-----+    +-----+    +-----+    +-----+    +-----+
-   |          |          |          |          |
-+-----+    +-----+    +-----+    +-----+    +-----+
-| PC  |    | Reg |    | ALU |    | DMEM|    | RF  |
-+-----+    +-----+    +-----+    +-----+    +-----+
-                 |          |
-            +----------+
-            | Forward  |
-            |  Unit    |
-            +----------+
-            
 
 ### Hazard Unit
 
