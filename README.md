@@ -46,3 +46,17 @@ This repository contains the source code (HDL), testbenches, and documentation f
 | **Write Back** | WB | Writes result back to register file |
 
 ### Block Diagram
+
++-----+    +-----+    +-----+    +-----+    +-----+
+| IF  | -> | ID  | -> | EX  | -> | MEM | -> | WB  |
++-----+    +-----+    +-----+    +-----+    +-----+
+   |          |          |          |          |
++-----+    +-----+    +-----+    +-----+    +-----+
+| PC  |    | Reg |    | ALU |    | DMEM|    | RF  |
++-----+    +-----+    +-----+    +-----+    +-----+
+                 |          |
+            +----------+
+            | Forward  |
+            |  Unit    |
+            +----------+
+            
