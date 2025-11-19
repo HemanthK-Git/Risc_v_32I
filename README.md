@@ -1,6 +1,6 @@
 # RISCV 5-Stage Pipeline Processor with Hazard Detection
 
-A hardware implementation of a 5-stage pipelined processor based on the RISC-V 32ISA. This project is designed for educational purposes, FPGA prototyping, and to serve as a baseline for microarchitectural exploration.
+A hardware implementation of a 5-stage pipelined processor based on the RISC-V 32I ISA. This project implements a complete 5-stage pipeline with comprehensive hazard detection and has been successfully synthesized for low-power medical applications, serving as a baseline microarchitecture for future pacemaker integration.
 
 ## 📑 Table of Contents
 
@@ -19,7 +19,7 @@ A hardware implementation of a 5-stage pipelined processor based on the RISC-V 3
 
 ## Overview
 
-This repository contains the source code (HDL), testbenches, and documentation for a classic 5-stage pipelined CPU. The processor implements the **RV32I** base integer instruction set, providing a complete, usable core. The five stages—Instruction Fetch (IF), Instruction Decode (ID), Execute (EX), Memory Access (MEM), and Write Back (WB)—are designed to maximize instruction throughput.
+This repository contains the source code and documentation for a fully-functional, 5-stage pipelined RISC-V CPU. The core implements the RV32I base integer instruction set and is built around the classic stages of Instruction Fetch (IF), Instruction Decode (ID), Execute (EX), Memory Access (MEM), and Write Back (WB) to maximize throughput. The design includes a comprehensive hazard detection and forwarding unit to ensure correct execution and maintain pipeline efficiency.
 
 ## Features
 
