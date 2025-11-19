@@ -1,8 +1,5 @@
 # RISC-V 5-Stage Pipeline Processor
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/[YourUsername]/[YourRepo]/blob/main/LICENSE)
-[![ISA](https://img.shields.io/badge/ISA-RV32I-orange.svg)](https://riscv.org/technical/specifications/)
-
 A hardware implementation of a 5-stage pipelined processor based on the RISC-V ISA. This project is designed for educational purposes, FPGA prototyping, and to serve as a baseline for microarchitectural exploration.
 
 ## 📑 Table of Contents
